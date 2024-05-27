@@ -26,7 +26,7 @@ onMounted(async () => {
 });
 
 function navigateToRecipes() {
-  router.push({ name: "recipes" });
+  // router.push({ name: "recipes" });
 }
 
 async function createAccount() {
@@ -52,7 +52,7 @@ async function login() {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Login successful!";
-      router.push({ name: "recipes" });
+      router.push({ name: "stories" });
     })
     .catch((error) => {
       console.log(error);
@@ -111,7 +111,7 @@ function closeSnackBar() {
             color="secondary"
             @click="navigateToRecipes()"
           >
-            View Published Recipes
+            View Published stories
           </v-btn>
         </v-card-title>
       </v-card>
