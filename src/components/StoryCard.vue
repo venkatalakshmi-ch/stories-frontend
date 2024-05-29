@@ -52,8 +52,7 @@ function handleEditClick(event) {
         </v-card-text>
         <v-expand-transition>
             <v-card-text class="pt-0" v-show="showDetails">
-                <h3>Content</h3>
-                <p>{{ story.content }}</p>
+                <p>{{ story.story }}</p>
             </v-card-text>
         </v-expand-transition>
     </v-card>

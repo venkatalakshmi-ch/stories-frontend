@@ -16,6 +16,12 @@ export default {
 
   getChatHistory(storyId) {
     return apiClient.get(`chat/story/${storyId}`);
-  }
+  },
+  getStory(id) {
+    return apiClient.get(`stories/${id}`);
+  },
+  updateStory(story) {
+    return apiClient.put(`stories/${story.id}`, story);
+  },
 
 };
