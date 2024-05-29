@@ -35,7 +35,7 @@ function handleEditClick(event) {
                     {{ story.title }}
                     <v-chip class="ma-2" color="primary" label>
                         <v-icon start icon="mdi-account-circle-outline"></v-icon>
-                        {{ story.author }}
+                        {{ story.user.firstName }} {{ story.user.lastName }}
                     </v-chip>
                     <v-chip class="ma-2" :color="story.isPublished ? 'green' : 'red'" label>
                         <v-icon start icon="mdi-check-circle-outline"></v-icon>

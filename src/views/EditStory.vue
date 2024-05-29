@@ -75,10 +75,12 @@ async function sendMesage() {
 
 
 
+
 async function getChatHistory() {
     await ChatServices.getChatHistory(router.currentRoute.value.params.id)
         .then((response) => {
             chatHistory.value = response.data;
+            window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
         })
         .catch((error) => {
             console.log(error);
@@ -91,7 +93,7 @@ async function getChatHistory() {
 
 async function publishStory(story) {
     selectedStory.value.story = story;
-    selectedStory.value.published = true;
+    selectedStory.value.isPublished = true;
     await ChatServices.updateStory(selectedStory.value)
         .then(() => {
             snackbar.value.value = true;
@@ -105,6 +107,7 @@ async function publishStory(story) {
             snackbar.value.text = error.response.data.message;
         });
 }
+
 </script>
 
 
