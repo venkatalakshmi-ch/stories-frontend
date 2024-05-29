@@ -9,21 +9,20 @@ const router = createRouter({
       component: () => import("./views/Login.vue"),
     },
     {
-      path: "/recipes",
-      name: "recipes",
-      component: () => import("./views/RecipeList.vue"),
+      path: "/admin-home",
+      name: "admin-home",
+      component: () => import("./views/AdminHome.vue"),
     },
     {
-      path: "/recipe/:id",
-      name: "editRecipe",
-      props: true,
-      component: () => import("./views/EditRecipe.vue"),
+      path: "/user-home",
+      name: "user-home",
+      component: () => import("./views/UserHome.vue"),
     },
     {
-      path: "/ingredients",
-      name: "ingredients",
-      component: () => import("./views/IngredientList.vue"),
-    },
+      path: "/edit-story/:id",
+      name: "edit-story",
+      component: () => import("./views/EditStory.vue"),
+    }
   ],
 });
 
