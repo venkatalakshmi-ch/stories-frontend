@@ -36,18 +36,14 @@ async function createStory() {
     return;
   }
   story.value.userId = user.value.id;
+
   await ChatServices.createStory(story.value)
     .then(async () => {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Story created successfully!";
       await getStories();
-    story = ref({
-        title: "",
-        story: "",
-        userId: 1,
-        isPublished: false,
-      });
+      story.value.title = "";
     })
     .catch((error) => {
       console.log(error);
@@ -84,7 +80,25 @@ onMounted(async () => {
   await getStories();
 });
 
-
+async function onDeleteStory(story) {
+  // confirm dialog
+  if (!confirm("Are you sure you want to delete this story?")) {
+    return;
+  }
+  await ChatServices.deleteStory(story.id)
+    .then(async () => {
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "Story deleted successfully!";
+      await getStories();
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
 
 function closeSnackBar() {
   snackbar.value.value = false;
@@ -113,8 +127,8 @@ function closeSnackBar() {
 
   <v-container>
     <v-row>
-      <v-col cols="12"  v-for="story in stories" :key="story.id">
-        <StoryCard :story="story" @edit-story="openEditDialog" />
+      <v-col cols="12" v-for="story in stories" :key="story.id">
+        <StoryCard :story="story" @edit-story="openEditDialog" @delete-story="onDeleteStory" />
       </v-col>
     </v-row>
   </v-container>
