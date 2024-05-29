@@ -10,6 +10,21 @@ const user = ref(null);
 const title = ref("Stories");
 const logoURL = ref("");
 
+
+function logout() {
+  UserServices.logoutUser()
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  localStorage.removeItem("user");
+  user.value = null;
+  router.push({ name: "login" });
+}
+
+
 onMounted(() => {
   logoURL.value = ocLogo;
   user.value = JSON.parse(localStorage.getItem("user"));
@@ -26,18 +41,7 @@ onMounted(() => {
   }
 });
 
-function logout() {
-  UserServices.logoutUser()
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  localStorage.removeItem("user");
-  user.value = null;
-  router.push({ name: "login" });
-}
+
 </script>
 
 <template>
