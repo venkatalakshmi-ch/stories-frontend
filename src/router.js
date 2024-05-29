@@ -16,7 +16,12 @@ const router = createRouter({
     {
       path: "/user-home",
       name: "user-home",
-      
+      component: () => import("./views/UserHome.vue"),
+    },
+    {
+      path: "/edit-story/:id",
+      name: "edit-story",
+      component: () => import("./views/EditStory.vue"),
     }
   ],
 });
