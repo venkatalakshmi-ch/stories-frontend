@@ -25,8 +25,8 @@ function closeSnackBar() {
 
 <template>
   <v-container>
-   <div>
-    <h1>Home</h1>
-   </div>
+    <div>
+      <h1>User Home</h1>
+    </div>
   </v-container>
 </template>
