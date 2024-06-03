@@ -24,18 +24,24 @@ const router = createRouter({
       component: () => import("./views/EditStory.vue"),
     },
     {
-      path:"/languages",
-      name:"languages",
+      path: "/languages",
+      name: "languages",
       component: () => import("./views/Languages.vue"),
     },
     {
-      path:"/genres",
-      name:"genres",
+      path: "/genres",
+      name: "genres",
       component: () => import("./views/Languages.vue"),
     },
     {
-      path:"/profile",
-      name:"profile",
+      path: "/countries",
+      name: "countries",
+      component: () => import("./views/Countries.vue"),
+
+    },
+    {
+      path: "/profile",
+      name: "profile",
       component: () => import("./views/Profile.vue"),
     }
 
