@@ -60,6 +60,9 @@ function showProfile() {
   router.push({ name: "profile" });
 }
 
+function showCountries() {
+  router.push({ name: "countries" });
+}
 
 </script>
 
@@ -131,6 +134,11 @@ function showProfile() {
         <v-list-item>
           <v-btn block variant="tonal" @click="showLanguages()">
             Languages
+          </v-btn>
+        </v-list-item>
+        <v-list-item>
+          <v-btn block variant="tonal" @click="showCountries()">
+            Countries
           </v-btn>
         </v-list-item>
 
