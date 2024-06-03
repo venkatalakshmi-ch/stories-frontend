@@ -79,7 +79,7 @@ function showCountries() {
         ></v-img>
       </router-link> -->
 
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="user !== null && user.type === 'admin'" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title class="title">
         {{ title }}
@@ -123,7 +123,7 @@ function showCountries() {
     </v-app-bar>
 
 
-    <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+    <v-navigation-drawer v-if="user !== null && user.type === 'admin'" v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
       <v-list nav dense>
         <v-list-item>
           <v-btn block variant="tonal" @click="showStories()">
