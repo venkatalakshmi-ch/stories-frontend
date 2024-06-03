@@ -24,6 +24,11 @@ function handleEditClick(event) {
     emit('edit-story', props.story);
 }
 
+function handleDelete(event) {
+    event.stopPropagation();
+    emit('delete-story', props.story);
+}
+
 
 </script>
 
@@ -41,6 +46,9 @@ function handleEditClick(event) {
                         <v-icon start icon="mdi-check-circle-outline"></v-icon>
                         {{ story.isPublished ? 'Published' : 'Unpublished' }}
                     </v-chip>
+                </v-col>
+                <v-col class="d-flex justify-end">
+                    <v-icon v-if="user !== null" size="small" icon="mdi-delete" @click="handleDelete" ></v-icon>
                 </v-col>
                 <v-col class="d-flex justify-end">
                     <v-icon v-if="user !== null" size="small" icon="mdi-pencil" @click="handleEditClick" ></v-icon>

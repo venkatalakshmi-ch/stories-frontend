@@ -22,7 +22,23 @@ const router = createRouter({
       path: "/edit-story/:id",
       name: "edit-story",
       component: () => import("./views/EditStory.vue"),
+    },
+    {
+      path:"/languages",
+      name:"languages",
+      component: () => import("./views/Languages.vue"),
+    },
+    {
+      path:"/genres",
+      name:"genres",
+      component: () => import("./views/Languages.vue"),
+    },
+    {
+      path:"/profile",
+      name:"profile",
+      component: () => import("./views/Profile.vue"),
     }
+
   ],
 });
 

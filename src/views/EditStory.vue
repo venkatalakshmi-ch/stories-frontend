@@ -129,7 +129,7 @@ async function publishStory(story) {
                     <v-card-actions v-if="chat.role === 'Chatbot'">
                         <v-spacer></v-spacer>
                         <v-btn class="publish-button" small @click="publishStory(chat.message)">
-                            Publish
+                            Add to story
                         </v-btn>
                     </v-card-actions>
                 </div>
