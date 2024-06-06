@@ -48,6 +48,16 @@ function handleDelete(event) {
                         <v-icon start icon="mdi-check-circle-outline"></v-icon>
                         {{ story.isPublished ? 'Published' : 'Unpublished' }}
                     </v-chip>
+                    <v-chip class="ma-2" color="blue" label>
+                        {{ story.genre.name }}
+                    </v-chip>
+                    <v-chip class="ma-2" color="blue" label>
+                        {{ story.language.name }}
+                    </v-chip>
+                    <v-chip class="ma-2" color="blue" label>
+                        {{ story.country.name }}
+                    </v-chip>
+
                 </v-col>
                 <v-col class="d-flex justify-end">
                     <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete" ></v-icon>
