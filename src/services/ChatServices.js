@@ -27,4 +27,16 @@ export default {
     return apiClient.delete(`stories/${id}`);
   },
 
+  addFavoriteStory(storyId, userId) {
+    return apiClient.post(`stories/addFavorite/${storyId}/${userId}`);
+  },
+
+  removeFavoriteStory(storyId, userId) {
+    return apiClient.delete(`stories/removeFavorite/${storyId}/${userId}`);
+  },
+
+  isFavoriteStory(storyId, userId) {
+    return apiClient.get(`stories/isFavorite/${storyId}/${userId}`);
+  },
+
 };
