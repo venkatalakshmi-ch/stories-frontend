@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { onMounted } from "vue";
+import { defineProps, defineEmits, computed } from 'vue';
 
 const router = useRouter();
 const showDetails = ref(false);
@@ -23,6 +24,7 @@ function handleEditClick(event) {
     event.stopPropagation();
     emit('edit-story', props.story);
 }
+const isAdmin = computed(() => user.value !== null && user.value.type === 'admin');
 
 function handleDelete(event) {
     event.stopPropagation();
@@ -48,10 +50,10 @@ function handleDelete(event) {
                     </v-chip>
                 </v-col>
                 <v-col class="d-flex justify-end">
-                    <v-icon v-if="user !== null" size="small" icon="mdi-delete" @click="handleDelete" ></v-icon>
+                    <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete" ></v-icon>
                 </v-col>
                 <v-col class="d-flex justify-end">
-                    <v-icon v-if="user !== null" size="small" icon="mdi-pencil" @click="handleEditClick" ></v-icon>
+                    <v-icon v-if="isAdmin" size="small" icon="mdi-pencil" @click="handleEditClick" ></v-icon>
                 </v-col>
             </v-row>
         </v-card-title>
