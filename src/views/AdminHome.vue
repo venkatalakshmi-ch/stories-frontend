@@ -22,10 +22,6 @@ const languages = ref([]);
 const genres = ref([]);
 const countries = ref([]);
 
-const selectedGenre = ref(null);
-const selectedLanguage = ref(null);
-const selectedCountry = ref(null);
-
 const stories = ref([]);
 
 const story = ref({
