@@ -31,7 +31,7 @@ const router = createRouter({
     {
       path: "/genres",
       name: "genres",
-      component: () => import("./views/Languages.vue"),
+      component: () => import("./views/Genres.vue"),
     },
     {
       path: "/countries",
