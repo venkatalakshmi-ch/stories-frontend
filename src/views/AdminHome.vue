@@ -4,6 +4,12 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import ChatServices from "../services/ChatServices";
 import StoryCard from "../components/StoryCard.vue";
+import GenreService from "../services/GenreService";
+import LanguageService from "../services/LanguageService";
+import CountriesService from "../services/CountriesService";
+
+
+
 const router = useRouter();
 const snackbar = ref({
   value: false,
@@ -12,6 +18,14 @@ const snackbar = ref({
 });
 
 
+const languages = ref([]);
+const genres = ref([]);
+const countries = ref([]);
+
+const selectedGenre = ref(null);
+const selectedLanguage = ref(null);
+const selectedCountry = ref(null);
+
 const stories = ref([]);
 
 const story = ref({
@@ -19,6 +33,9 @@ const story = ref({
   story: "",
   userId: 1,
   isPublished: false,
+  genreId: null,
+  languageId: null,
+  countryId: null,
 });
 
 
@@ -35,6 +52,29 @@ async function createStory() {
     snackbar.value.text = "Title is required!";
     return;
   }
+
+  if (story.value.genreId === null) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Genre is required!";
+    return;
+  }
+
+  if (story.value.languageId === null) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Language is required!";
+    return;
+  }
+
+  if (story.value.countryId === null) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Country is required!";
+    return;
+  }
+
+
   story.value.userId = user.value.id;
 
   await ChatServices.createStory(story.value)
@@ -78,6 +118,10 @@ onMounted(async () => {
   }
 
   await getStories();
+  await getLanguages();
+  await getGenres();
+  await getCountries();
+
 });
 
 async function onDeleteStory(story) {
@@ -100,6 +144,47 @@ async function onDeleteStory(story) {
     });
 }
 
+
+async function getLanguages() {
+  await LanguageService.getLanguages()
+    .then((response) => {
+      languages.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+async function getGenres() {
+  await GenreService.getGenres()
+    .then((response) => {
+      genres.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+async function getCountries() {
+  await CountriesService.getCountries()
+    .then((response) => {
+      countries.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+
 function closeSnackBar() {
   snackbar.value.value = false;
 }
@@ -113,7 +198,18 @@ function closeSnackBar() {
   <v-container>
     <v-card class="rounded-lg elevation-5">
       <v-card-title class="headline mb-2">Stories </v-card-title>
-
+      <v-row class="mx-2">
+        <v-col cols="12" md="4">
+          <v-select v-model="story.genreId" :items="genres" item-title="name" item-value="id" label="Genre" required></v-select>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-select v-model="story.languageId" :items="languages" item-title="name" item-value="id" label="Language" required></v-select>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-select v-model="story.countryId" :items="countries" item-title="name" item-value="id" label="Country"
+            required></v-select>
+        </v-col>
+      </v-row>
       <v-card-text>
         <v-text-field v-model="story.title" label="Title" required>
         </v-text-field>
