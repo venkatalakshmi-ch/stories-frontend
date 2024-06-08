@@ -5,7 +5,6 @@ import { onMounted } from "vue";
 import { defineProps, defineEmits, computed } from 'vue';
 
 const router = useRouter();
-const showDetails = ref(false);
 const user = ref(null);
 
 const props = defineProps({
@@ -31,6 +30,10 @@ function handleDelete(event) {
     emit('delete-story', props.story);
 }
 
+
+function showPreview(story) {
+    router.push({ name: 'preview', params: { id: story.id } });
+}
 
 </script>
 
@@ -60,21 +63,16 @@ function handleDelete(event) {
 
                 </v-col>
                 <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete" ></v-icon>
+                    <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete"></v-icon>
                 </v-col>
                 <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-pencil" @click="handleEditClick" ></v-icon>
+                    <v-icon v-if="isAdmin" size="small" icon="mdi-pencil" @click="handleEditClick"></v-icon>
                 </v-col>
             </v-row>
         </v-card-title>
-        <v-card-text class="body-1">
-            {{ story.content }}
+        <v-card-text @click="showPreview(story)" class="body-1">
+            {{ story.story }}
         </v-card-text>
-        <v-expand-transition>
-            <v-card-text class="pt-0" v-show="showDetails">
-                <p>{{ story.story }}</p>
-            </v-card-text>
-        </v-expand-transition>
     </v-card>
 </template>
 

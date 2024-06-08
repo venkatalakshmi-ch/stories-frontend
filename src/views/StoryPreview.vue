@@ -17,9 +17,6 @@ const user = ref({});
 
 onMounted(async () => {
   user.value = JSON.parse(localStorage.getItem("user"));
-  if (user.value.type === "admin") {
-    router.push({ name: "admin-home" });
-  }
   await getStory();
 }
 );
@@ -36,6 +33,7 @@ async function getStory() {
     const response = await ChatService.getStory(id.value);
     story.value = response.data;
     await checkIfFavorite();
+    await getFeedbacks();
   } catch (error) {
     snackbar.value.value = true;
     snackbar.value.color = "error";
@@ -89,6 +87,103 @@ async function removeFavorite() {
   }
 }
 
+const feedback = ref({
+  message: "",
+  userId: null,
+  storyId: null,
+});
+
+const feedbacks = ref([]);
+
+
+async function addFeedback() {
+  if (feedback.value.message === "") {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Feedback message cannot be empty";
+    return;
+  }
+
+  feedback.value.userId = user.value.id;
+  feedback.value.storyId = story.value.id;
+  try {
+    await ChatService.addFeedback(feedback.value);
+    snackbar.value.value = true;
+    snackbar.value.color = "green";
+    snackbar.value.text = "Feedback added";
+    feedback.value.message = "";
+    await getFeedbacks();
+  } catch (error) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Failed to add feedback";
+  }
+}
+
+async function deleteFeedback(feed) {
+  try {
+    await ChatService.removeFeedback(feed);
+    snackbar.value.value = true;
+    snackbar.value.color = "green";
+    snackbar.value.text = "Feedback deleted";
+    await getFeedbacks();
+  } catch (error) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Failed to delete feedback";
+  }
+}
+
+
+async function getFeedbacks() {
+  try {
+    const response = await ChatService.getFeedbacks(story.value.id);
+    feedbacks.value = response.data;
+  } catch (error) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Failed to get feedbacks";
+  }
+}
+
+const selectedFeedback = ref(null);
+
+const openEditDialog = ref(false);
+
+function editFeedback(feed) {
+  selectedFeedback.value = feed;
+  openEditDialog.value = true;
+}
+
+function closeFeedbackDialog() {
+  openEditDialog.value = false;
+}
+
+
+async function saveFeedback() {
+
+  if (selectedFeedback.value.message === "") {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Feedback message cannot be empty";
+    return;
+  }
+  try {
+    await ChatService.editFeedback(selectedFeedback.value);
+    snackbar.value.value = true;
+    snackbar.value.color = "green";
+    snackbar.value.text = "Feedback updated";
+    closeFeedbackDialog();
+    await getFeedbacks();
+  } catch (error) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Failed to update feedback";
+  }
+}
+
+
+
 
 
 
@@ -114,13 +209,71 @@ function closeSnackBar() {
           <v-btn size="large"></v-btn>
           <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
           <v-btn v-if="isFavoriteStory" size="large" color="primary" icon="mdi-heart" @click="removeFavorite" />
-
         </v-card-actions>
 
 
-        <v-card-text>{{ story.story }}</v-card-text>
+        <v-card-text>
+        {{ story.story }}
+
+        <v-divider class="my-3"></v-divider>
+
+        <v-card-title v-if="feedbacks.length>0">Feedbacks</v-card-title>
+        <v-list v-if="feedbacks.length>0">
+          <v-list-item  class="my-3"  v-for="item in feedbacks" :key="item.id">
+              <v-list-item-title>
+                <v-row>
+                  <v-col cols="10">
+                    {{ item.message }}
+                  </v-col>
+                  <v-col v-if="user.id === item.user.id" cols="2">
+                    <v-btn class="ma-2"  @click="editFeedback(item)">
+                      <v-icon color="green">mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn  @click="deleteFeedback(item)">
+                      <v-icon color="red">mdi-delete</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-list-item-title>
+              <v-list-item-subtitle> <v-spacer></v-spacer>{{ item.user.firstName }} {{ item.user.lastName }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+
+        <v-divider class="my-3"></v-divider>
+
+        <v-text-field v-model="feedback.message" label="Add Feedback" outlined></v-text-field>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="flat" @click="addFeedback" color="primary">Add Feedback</v-btn>
+        </v-card-actions>        
+        </v-card-text>
+
+        <v-dialog v-model="openEditDialog" max-width="500px">
+          <v-card>
+            <v-card-title>Edit Feedback</v-card-title>
+            <v-card-text>
+              <v-text-field v-model="selectedFeedback.message" label="Feedback" outlined></v-text-field>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="flat" @click="closeFeedbackDialog">Cancel</v-btn>
+              <v-btn variant="flat" @click="saveFeedback" color="primary">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
       </v-card>
     </div>
   </v-container>
 </template>
+
+
+<style scoped>
+
+.v-list-item {
+  background-color: #e0ecd7;
+  border-radius: 10px;
+  padding: 10px;
+}
+</style>
