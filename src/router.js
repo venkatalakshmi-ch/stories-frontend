@@ -48,6 +48,11 @@ const router = createRouter({
       path:"/preview/:id",
       name:"preview",
       component: () => import("./views/StoryPreview.vue"),
+    },
+    {
+      path:"/change-password",
+      name:"change-password",
+      component: () => import("./views/ChangePassword.vue"),
     }
 
   ],
