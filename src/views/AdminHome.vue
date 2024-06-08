@@ -24,6 +24,12 @@ const countries = ref([]);
 
 const stories = ref([]);
 
+const myStories = ref([]);
+
+const favoriteStories = ref([]);
+
+
+
 const story = ref({
   title: "",
   story: "",
@@ -117,8 +123,37 @@ onMounted(async () => {
   await getLanguages();
   await getGenres();
   await getCountries();
+  await getMyStories();
+  await getFavoriteStories();
 
 });
+
+async function getMyStories() {
+  await ChatServices.getStoriesByUser(user.value.id)
+    .then((response) => {
+      myStories.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+async function getFavoriteStories() {
+  await ChatServices.getFavoriteStoriesByUser(user.value.id)
+    .then((response) => {
+      favoriteStories.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
 
 async function onDeleteStory(story) {
   // confirm dialog
@@ -180,12 +215,17 @@ async function getCountries() {
     });
 }
 
+const selectedTab = ref(0);
+
+function changeTab(index) {
+  selectedTab.value = index;
+}
+
+
 
 function closeSnackBar() {
   snackbar.value.value = false;
 }
-
-
 
 </script>
 
@@ -196,10 +236,12 @@ function closeSnackBar() {
       <v-card-title class="headline mb-2">Stories </v-card-title>
       <v-row class="mx-2">
         <v-col cols="12" md="4">
-          <v-select v-model="story.genreId" :items="genres" item-title="name" item-value="id" label="Genre" required></v-select>
+          <v-select v-model="story.genreId" :items="genres" item-title="name" item-value="id" label="Genre"
+            required></v-select>
         </v-col>
         <v-col cols="12" md="4">
-          <v-select v-model="story.languageId" :items="languages" item-title="name" item-value="id" label="Language" required></v-select>
+          <v-select v-model="story.languageId" :items="languages" item-title="name" item-value="id" label="Language"
+            required></v-select>
         </v-col>
         <v-col cols="12" md="4">
           <v-select v-model="story.countryId" :items="countries" item-title="name" item-value="id" label="Country"
@@ -218,11 +260,34 @@ function closeSnackBar() {
   </v-container>
 
   <v-container>
-    <v-row>
+
+    <v-tabs class="my-5 rounded-lg elevation-5" bg-color="primary" fixed-tabs>
+     
+      <v-tab v-for="(tab, index) in ['All Stories', 'My Stories', 'Favorite Stories']" :key="index"
+        @click="changeTab(index)">
+        {{ tab }}
+      </v-tab>
+    </v-tabs>
+
+    <v-row v-if="selectedTab == 0">
       <v-col cols="12" v-for="story in stories" :key="story.id">
         <StoryCard :story="story" @edit-story="openEditDialog" @delete-story="onDeleteStory" />
       </v-col>
     </v-row>
+
+    <v-row v-if="selectedTab == 1">
+      <v-col cols="12" v-for="story in myStories" :key="story.id">
+        <StoryCard :story="story" @edit-story="openEditDialog" @delete-story="onDeleteStory" />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="selectedTab == 2">
+      <v-col cols="12" v-for="story in favoriteStories" :key="story.id">
+        <StoryCard :story="story" @edit-story="openEditDialog" @delete-story="onDeleteStory" />
+      </v-col>
+    </v-row>
+
+    
   </v-container>
 
 
@@ -236,3 +301,14 @@ function closeSnackBar() {
     </template>
   </v-snackbar>
 </template>
+
+
+<style scoped>
+  .rounded-lg {
+    border-radius: 20px;
+  }
+
+  .elevation-5 {
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  }
+</style>

@@ -38,7 +38,7 @@ function showPreview(story) {
 </script>
 
 <template>
-    <v-card class="rounded-lg elevation-5 mb-1" @click="showDetails = !showDetails">
+    <v-card  @click="showPreview(story)" class="rounded-lg elevation-5 mb-1">
         <v-card-title class="headline">
             <v-row align="center">
                 <v-col cols="10">
@@ -62,15 +62,9 @@ function showPreview(story) {
                     </v-chip>
 
                 </v-col>
-                <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete"></v-icon>
-                </v-col>
-                <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-pencil" @click="handleEditClick"></v-icon>
-                </v-col>
             </v-row>
         </v-card-title>
-        <v-card-text @click="showPreview(story)" class="body-1">
+        <v-card-text  class="body-1">
             {{ story.story }}
         </v-card-text>
     </v-card>
