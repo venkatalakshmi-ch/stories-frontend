@@ -64,6 +64,11 @@ function showCountries() {
   router.push({ name: "countries" });
 }
 
+
+function changePassword() {
+  router.push({ name: "change-password" });
+}
+
 </script>
 
 <template>
@@ -151,6 +156,12 @@ function showCountries() {
         <v-list-item>
           <v-btn block variant="tonal" @click="showProfile()">
             Profile
+          </v-btn>
+        </v-list-item>
+
+        <v-list-item>
+          <v-btn block variant="tonal" @click="changePassword()">
+            Change Password
           </v-btn>
         </v-list-item>
 
