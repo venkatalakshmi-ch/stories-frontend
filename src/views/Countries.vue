@@ -2,8 +2,7 @@
 import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import LangugeService from "../services/LanguageService";
-
+import CountriesService from "../services/CountriesService";
 
 const router = useRouter();
 
@@ -14,22 +13,20 @@ const snackbar = ref({
   text: "",
 });
 
-const languages = ref([]);
+const countries = ref([]);
 
-const language = ref({
+const country = ref({
   name: "",
   description: ""
 });
 
 const dialog = ref(false);
 
-const selectedLanguage = ref({});
+const selectedCountry = ref({});
 
 const openEditDialog = async (lang) => {
-
-  selectedLanguage.value = lang;
+  selectedCountry.value = lang;
   dialog.value = true;
-
 };
 
 
@@ -44,100 +41,77 @@ onMounted(async () => {
     router.push({ name: "login" });
   }
 
-  getLanguages();
+  await getCountries();
 });
 
-function getLanguages() {
-  LangugeService.getLanguages()
+async function getCountries() {
+  CountriesService.getCountries()
     .then((response) => {
-      languages.value = response.data;
+      countries.value = response.data;
     })
     .catch((e) => {
       console.log(e);
     });
 }
 
+function createCountry() {
 
-function createLanguage() {
-
-  if(language.value.name === "" || language.value.description === "") {
-    snackbar.value.color = "red";
-    snackbar.value.text = "Please fill all fields";
-    snackbar.value.value = true;
-    return;
-  }
-  
-  LangugeService.createLanguage(language.value)
-    .then((response) => {
-      getLanguages();
-      snackbar.value.color = "green";
-      snackbar.value.text = "Language created successfully";
-      snackbar.value.value = true;
-
-      language.value.name = "";
-      language.value.description = "";
-
-    })
-    .catch((e) => {
-
-      snackbar.value.color = "red";
-      snackbar.value.text = "Error creating language";
-      snackbar.value.value = true;
-      console.log(e);
-    });
-}
-
-
-
-function updateLanguage() {
-
-  if(selectedLanguage.value.name === "" || selectedLanguage.value.description === "") {
+  if (country.value.name === "" || country.value.description === "") {
     snackbar.value.color = "red";
     snackbar.value.text = "Please fill all fields";
     snackbar.value.value = true;
     return;
   }
 
-
-
-  LangugeService.updateLanguage(selectedLanguage.value)
+  CountriesService.createCountry(country.value)
     .then((response) => {
-      getLanguages();
+      getCountries();
       snackbar.value.color = "green";
-      snackbar.value.text = "Language updated successfully";
+      snackbar.value.text = "Country created successfully";
       snackbar.value.value = true;
 
-      selectedLanguage.value.name = "";
-      selectedLanguage.value.description = "";
-
-      dialog.value = false;
+      country.value.name = "";
+      country.value.description = "";
     })
     .catch((e) => {
       snackbar.value.color = "red";
-      snackbar.value.text = "Error updating language";
+      snackbar.value.text = "Error creating country";
       snackbar.value.value = true;
       console.log(e);
     });
 }
 
-
-function onDeleteLanguage(lang) {
-
-  // add confirmation
-  if (!confirm("Are you sure you want to delete this language?")) {
-    return;
-  }
-
-  LangugeService.deleteLanguage(lang.id)
+function updateCountry() {
+  CountriesService.updateCountry(selectedCountry.value)
     .then((response) => {
-      getLanguages();
+      getCountries();
       snackbar.value.color = "green";
-      snackbar.value.text = "Language deleted successfully";
+      snackbar.value.text = "Country updated successfully";
+      snackbar.value.value = true;
+
+      selectedCountry.value = {};
+
+      closeDialog();
+    })
+    .catch((e) => {
+      snackbar.value.color = "red";
+      snackbar.value.text = "Error updating country";
+      snackbar.value.value = true;
+      console.log(e);
+    });
+}
+
+function onDeleteCountry(country) {
+  CountriesService.deleteCountry(country.id)
+    .then((response) => {
+      getCountries();
+      snackbar.value.color = "green";
+      snackbar.value.text = "Country deleted successfully";
       snackbar.value.value = true;
     })
     .catch((e) => {
       snackbar.value.color = "red";
-      snackbar.value.text = "Error deleting language";
+      snackbar.value.text = "Error deleting country";
       snackbar.value.value = true;
       console.log(e);
     });
@@ -159,26 +133,26 @@ function closeSnackBar() {
 
   <v-container>
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Languages </v-card-title>
+      <v-card-title class="headline mb-2">Countries </v-card-title>
 
       <v-card-text>
-        <v-text-field v-model="language.name" label="Title" required>
+        <v-text-field v-model="country.name" label="Title" required>
         </v-text-field>
-        <v-text-field v-model="language.description" label="Description" required>
+        <v-text-field v-model="country.description" label="Description" required>
         </v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="flat" color="primary" @click="createLanguage()">Create language</v-btn>
+        <v-btn variant="flat" color="primary" @click="createCountry()">Create country</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
 
 
   <v-container>
-    <v-card-title class="headline mb-2">Available Languages </v-card-title>
+    <v-card-title class="headline mb-2">Available countries </v-card-title>
 
-    <div v-for="lang in languages" :key="lang.id">
+    <div v-for="lang in countries" :key="lang.id">
       <v-card class="mb-2">
         <v-card-title>
           <v-row>
@@ -190,7 +164,7 @@ function closeSnackBar() {
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
 
-              <v-btn icon @click="onDeleteLanguage(lang)">
+              <v-btn icon @click="onDeleteCountry(lang)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-col>
@@ -206,17 +180,17 @@ function closeSnackBar() {
   <template v-if="dialog">
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
-        <v-card-title class="headline">Edit Language</v-card-title>
+        <v-card-title class="headline">Edit country</v-card-title>
         <v-card-text>
-          <v-text-field v-model="selectedLanguage.name" label="Title" required>
+          <v-text-field v-model="selectedCountry.name" label="Title" required>
           </v-text-field>
-          <v-text-field v-model="selectedLanguage.description" label="Description" required>
+          <v-text-field v-model="selectedCountry.description" label="Description" required>
           </v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="flat"  @click="closeDialog()">Cancel</v-btn>
-          <v-btn variant="flat" color="primary" @click="updateLanguage()">Update language</v-btn>
+          <v-btn variant="flat" @click="closeDialog()">Cancel</v-btn>
+          <v-btn variant="flat" color="primary" @click="updateCountry()">Update country</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -224,7 +198,6 @@ function closeSnackBar() {
 
   <v-snackbar v-model="snackbar.value" rounded="pill">
     {{ snackbar.text }}
-
     <template v-slot:actions>
       <v-btn :color="snackbar.color" variant="text" @click="closeSnackBar()">
         Close

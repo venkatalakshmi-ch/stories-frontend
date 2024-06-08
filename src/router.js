@@ -24,19 +24,35 @@ const router = createRouter({
       component: () => import("./views/EditStory.vue"),
     },
     {
-      path:"/languages",
-      name:"languages",
+      path: "/languages",
+      name: "languages",
       component: () => import("./views/Languages.vue"),
     },
     {
-      path:"/genres",
-      name:"genres",
-      component: () => import("./views/Languages.vue"),
+      path: "/genres",
+      name: "genres",
+      component: () => import("./views/Genres.vue"),
     },
     {
-      path:"/profile",
-      name:"profile",
+      path: "/countries",
+      name: "countries",
+      component: () => import("./views/Countries.vue"),
+
+    },
+    {
+      path: "/profile",
+      name: "profile",
       component: () => import("./views/Profile.vue"),
+    },
+    {
+      path:"/preview/:id",
+      name:"preview",
+      component: () => import("./views/StoryPreview.vue"),
+    },
+    {
+      path:"/change-password",
+      name:"change-password",
+      component: () => import("./views/ChangePassword.vue"),
     }
 
   ],

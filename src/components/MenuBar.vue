@@ -60,6 +60,14 @@ function showProfile() {
   router.push({ name: "profile" });
 }
 
+function showCountries() {
+  router.push({ name: "countries" });
+}
+
+
+function changePassword() {
+  router.push({ name: "change-password" });
+}
 
 </script>
 
@@ -76,7 +84,7 @@ function showProfile() {
         ></v-img>
       </router-link> -->
 
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="user !== null && user.type === 'admin'" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title class="title">
         {{ title }}
@@ -120,7 +128,7 @@ function showProfile() {
     </v-app-bar>
 
 
-    <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+    <v-navigation-drawer v-if="user !== null && user.type === 'admin'" v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
       <v-list nav dense>
         <v-list-item>
           <v-btn block variant="tonal" @click="showStories()">
@@ -133,6 +141,11 @@ function showProfile() {
             Languages
           </v-btn>
         </v-list-item>
+        <v-list-item>
+          <v-btn block variant="tonal" @click="showCountries()">
+            Countries
+          </v-btn>
+        </v-list-item>
 
         <v-list-item>
           <v-btn block variant="tonal" @click="showGenres()">
@@ -143,6 +156,12 @@ function showProfile() {
         <v-list-item>
           <v-btn block variant="tonal" @click="showProfile()">
             Profile
+          </v-btn>
+        </v-list-item>
+
+        <v-list-item>
+          <v-btn block variant="tonal" @click="changePassword()">
+            Change Password
           </v-btn>
         </v-list-item>
 

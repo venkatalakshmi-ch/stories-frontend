@@ -27,4 +27,35 @@ export default {
     return apiClient.delete(`stories/${id}`);
   },
 
+  addFavoriteStory(storyId, userId) {
+    return apiClient.post(`stories/addFavorite/${storyId}/${userId}`);
+  },
+
+  removeFavoriteStory(storyId, userId) {
+    return apiClient.delete(`stories/removeFavorite/${storyId}/${userId}`);
+  },
+
+  isFavoriteStory(storyId, userId) {
+    return apiClient.get(`stories/isFavorite/${storyId}/${userId}`);
+  },
+
+  addFeedback(feedback) {
+    return apiClient.post(`stories/addFeedback/${feedback.storyId}/${feedback.userId}`, feedback);
+  },
+
+  removeFeedback(feedback) {
+    console.log(feedback);
+    return apiClient.delete(`stories/removeFeedback/${feedback.id}`);
+  },
+
+  editFeedback(feedback) {
+    return apiClient.put(`stories/editFeedback/${feedback.id}`, feedback);
+  },
+
+  getFeedbacks(storyId) {
+    return apiClient.get(`stories/feedbacks/${storyId}`);
+  },
+
+
+
 };

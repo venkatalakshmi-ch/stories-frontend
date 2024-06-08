@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import LangugeService from "../services/LanguageService";
+import GenreService from "../services/GenreService";
 
 
 const router = useRouter();
@@ -14,20 +14,20 @@ const snackbar = ref({
   text: "",
 });
 
-const languages = ref([]);
+const genres = ref([]);
 
-const language = ref({
+const genre = ref({
   name: "",
   description: ""
 });
 
 const dialog = ref(false);
 
-const selectedLanguage = ref({});
+const selectedGenre = ref({});
 
 const openEditDialog = async (lang) => {
 
-  selectedLanguage.value = lang;
+  selectedGenre.value = lang;
   dialog.value = true;
 
 };
@@ -44,13 +44,13 @@ onMounted(async () => {
     router.push({ name: "login" });
   }
 
-  getLanguages();
+  getGenres();
 });
 
-function getLanguages() {
-  LangugeService.getLanguages()
+function getGenres() {
+  GenreService.getGenres()
     .then((response) => {
-      languages.value = response.data;
+      genres.value = response.data;
     })
     .catch((e) => {
       console.log(e);
@@ -58,30 +58,30 @@ function getLanguages() {
 }
 
 
-function createLanguage() {
+function createGenre() {
 
-  if(language.value.name === "" || language.value.description === "") {
+  if(genre.value.name === "" || genre.value.description === "") {
     snackbar.value.color = "red";
     snackbar.value.text = "Please fill all fields";
     snackbar.value.value = true;
     return;
   }
   
-  LangugeService.createLanguage(language.value)
+  GenreService.createGenre(genre.value)
     .then((response) => {
-      getLanguages();
+      getGenres();
       snackbar.value.color = "green";
-      snackbar.value.text = "Language created successfully";
+      snackbar.value.text = "Genre created successfully";
       snackbar.value.value = true;
 
-      language.value.name = "";
-      language.value.description = "";
+      genre.value.name = "";
+      genre.value.description = "";
 
     })
     .catch((e) => {
 
       snackbar.value.color = "red";
-      snackbar.value.text = "Error creating language";
+      snackbar.value.text = "Error creating genre";
       snackbar.value.value = true;
       console.log(e);
     });
@@ -89,9 +89,9 @@ function createLanguage() {
 
 
 
-function updateLanguage() {
+function updateGenre() {
 
-  if(selectedLanguage.value.name === "" || selectedLanguage.value.description === "") {
+  if(selectedGenre.value.name === "" || selectedGenre.value.description === "") {
     snackbar.value.color = "red";
     snackbar.value.text = "Please fill all fields";
     snackbar.value.value = true;
@@ -100,44 +100,44 @@ function updateLanguage() {
 
 
 
-  LangugeService.updateLanguage(selectedLanguage.value)
+  GenreService.updateGenre(selectedGenre.value)
     .then((response) => {
-      getLanguages();
+      getGenres();
       snackbar.value.color = "green";
-      snackbar.value.text = "Language updated successfully";
+      snackbar.value.text = "Genre updated successfully";
       snackbar.value.value = true;
 
-      selectedLanguage.value.name = "";
-      selectedLanguage.value.description = "";
+      selectedGenre.value.name = "";
+      selectedGenre.value.description = "";
 
       dialog.value = false;
     })
     .catch((e) => {
       snackbar.value.color = "red";
-      snackbar.value.text = "Error updating language";
+      snackbar.value.text = "Error updating genre";
       snackbar.value.value = true;
       console.log(e);
     });
 }
 
 
-function onDeleteLanguage(lang) {
+function onDeleteGenre(lang) {
 
   // add confirmation
-  if (!confirm("Are you sure you want to delete this language?")) {
+  if (!confirm("Are you sure you want to delete this genre?")) {
     return;
   }
 
-  LangugeService.deleteLanguage(lang.id)
+  GenreService.deleteGenre(lang.id)
     .then((response) => {
-      getLanguages();
+      getGenres();
       snackbar.value.color = "green";
-      snackbar.value.text = "Language deleted successfully";
+      snackbar.value.text = "Genre deleted successfully";
       snackbar.value.value = true;
     })
     .catch((e) => {
       snackbar.value.color = "red";
-      snackbar.value.text = "Error deleting language";
+      snackbar.value.text = "Error deleting genre";
       snackbar.value.value = true;
       console.log(e);
     });
@@ -159,26 +159,26 @@ function closeSnackBar() {
 
   <v-container>
     <v-card class="rounded-lg elevation-5">
-      <v-card-title class="headline mb-2">Languages </v-card-title>
+      <v-card-title class="headline mb-2">Genres </v-card-title>
 
       <v-card-text>
-        <v-text-field v-model="language.name" label="Title" required>
+        <v-text-field v-model="genre.name" label="Title" required>
         </v-text-field>
-        <v-text-field v-model="language.description" label="Description" required>
+        <v-text-field v-model="genre.description" label="Description" required>
         </v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="flat" color="primary" @click="createLanguage()">Create language</v-btn>
+        <v-btn variant="flat" color="primary" @click="createGenre()">Create genre</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
 
 
   <v-container>
-    <v-card-title class="headline mb-2">Available Languages </v-card-title>
+    <v-card-title class="headline mb-2">Available Genres </v-card-title>
 
-    <div v-for="lang in languages" :key="lang.id">
+    <div v-for="lang in genres" :key="lang.id">
       <v-card class="mb-2">
         <v-card-title>
           <v-row>
@@ -190,7 +190,7 @@ function closeSnackBar() {
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
 
-              <v-btn icon @click="onDeleteLanguage(lang)">
+              <v-btn icon @click="onDeleteGenre(lang)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-col>
@@ -206,17 +206,17 @@ function closeSnackBar() {
   <template v-if="dialog">
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
-        <v-card-title class="headline">Edit Language</v-card-title>
+        <v-card-title class="headline">Edit Genre</v-card-title>
         <v-card-text>
-          <v-text-field v-model="selectedLanguage.name" label="Title" required>
+          <v-text-field v-model="selectedGenre.name" label="Title" required>
           </v-text-field>
-          <v-text-field v-model="selectedLanguage.description" label="Description" required>
+          <v-text-field v-model="selectedGenre.description" label="Description" required>
           </v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="flat"  @click="closeDialog()">Cancel</v-btn>
-          <v-btn variant="flat" color="primary" @click="updateLanguage()">Update language</v-btn>
+          <v-btn variant="flat" color="primary" @click="updateGenre()">Update genre</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
