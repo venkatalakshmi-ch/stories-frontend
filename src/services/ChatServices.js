@@ -56,6 +56,30 @@ export default {
     return apiClient.get(`stories/feedbacks/${storyId}`);
   },
 
+  // get all stories by a user
+  getStoriesByUser(userId) {
+    return apiClient.get(`stories/user/${userId}`);
+  },
+
+  // get all published stories by a user
+  getPublishedStoriesByUser(userId) {
+    return apiClient.get(`stories/published/${userId}`);
+  },
+
+  // get all favorite stories by a user
+  getFavoriteStoriesByUser(userId) {
+    return apiClient.get(`stories/favorite/${userId}`);
+  },
+
+  // get all published stories
+  getPublishedStories() {
+    return apiClient.get("stories/published");
+  },
+
+  // get favorite stories by a user
+  getFavoriteStoriesByUser(userId) {
+    return apiClient.get(`stories/favorite/${userId}`);
+  },
 
 
 };

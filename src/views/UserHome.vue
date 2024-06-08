@@ -3,7 +3,7 @@ import { onMounted } from "vue";
 import { ref, toRaw } from "vue";
 import { useRouter } from "vue-router";
 import ChatService from "../services/ChatServices.js";
-
+import StoryCard from "../components/StoryCard.vue";
 import GenreService from "../services/GenreService";
 import LanguageService from "../services/LanguageService";
 import CountriesService from "../services/CountriesService";
@@ -36,6 +36,8 @@ onMounted(async () => {
   await getGenres();
   await getLanguages();
   await getCountries();
+  await getMyStories();
+  await getFavoriteStories();
 }
 );
 
@@ -43,7 +45,7 @@ const stories = ref([]);
 
 async function getStories() {
   try {
-    const response = await ChatService.getStories();
+    const response = await ChatService.getPublishedStories();
     stories.value = response.data;
     filterStories();
   } catch (error) {
@@ -127,6 +129,46 @@ async function onCountryFilterChange() {
 }
 
 
+const myStories = ref([]);
+
+const favoriteStories = ref([]);
+
+
+const selectedTab = ref(0);
+
+function changeTab(index) {
+  selectedTab.value = index;
+}
+
+
+async function getMyStories() {
+  await ChatService.getStoriesByUser(user.value.id)
+    .then((response) => {
+      myStories.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+async function getFavoriteStories() {
+  await ChatService.getFavoriteStoriesByUser(user.value.id)
+    .then((response) => {
+      favoriteStories.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+
+
 function closeSnackBar() {
   snackbar.value.value = false;
 }
@@ -134,51 +176,53 @@ function closeSnackBar() {
 
 <template>
   <v-container>
-    <v-card>
-      <v-card-title>
-        <v-row>
-          <v-col cols="4">
-            <v-select v-model="selectedGenreFilterId" :items="genres" label="Genre" item-title="name" item-value="id"
-              @update:modelValue="onGenreFilterChange"></v-select>
-          </v-col>
-          <v-col cols="4">
-            <v-select v-model="selectedLanguageFilterId" :items="languages" label="Language" item-title="name"
-              item-value="id" @update:modelValue="onLanguageFilterChange"></v-select>
-          </v-col>
-          <v-col cols="4">
-            <v-select v-model="selectedCountryFilterId" :items="countries" label="Country" item-title="name"
-              item-value="id" @update:modelValue="onCountryFilterChange"></v-select>
-          </v-col>
-        </v-row>
-      </v-card-title>
-    </v-card>
-  </v-container>
 
-  <v-container>
-    <v-row>
-      <v-col cols="12" v-for="story in filterdStories" :key="story.id">
-        <v-card @click="previewStory(story)">
-          <v-card-title>{{ story.title }}
-            <v-chip class="ma-2" color="primary" label>
-              <v-icon start icon="mdi-account-circle-outline"></v-icon>
-              {{ story.user.firstName }} {{ story.user.lastName }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.genre.name }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.language.name }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.country.name }}
-            </v-chip>
+    <v-tabs class="my-5 rounded-lg elevation-5" bg-color="primary" fixed-tabs>
 
+      <v-tab v-for="(tab, index) in ['All Stories', 'My Stories', 'Favorite Stories']" :key="index"
+        @click="changeTab(index)">
+        {{ tab }}
+      </v-tab>
+    </v-tabs>
+
+    <v-row v-if="selectedTab == 0">
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <v-row>
+              <v-col cols="4">
+                <v-select v-model="selectedGenreFilterId" :items="genres" label="Genre" item-title="name"
+                  item-value="id" @update:modelValue="onGenreFilterChange"></v-select>
+              </v-col>
+              <v-col cols="4">
+                <v-select v-model="selectedLanguageFilterId" :items="languages" label="Language" item-title="name"
+                  item-value="id" @update:modelValue="onLanguageFilterChange"></v-select>
+              </v-col>
+              <v-col cols="4">
+                <v-select v-model="selectedCountryFilterId" :items="countries" label="Country" item-title="name"
+                  item-value="id" @update:modelValue="onCountryFilterChange"></v-select>
+              </v-col>
+            </v-row>
           </v-card-title>
-          <v-card-text>
-            {{ story.story }}
-          </v-card-text>
         </v-card>
+      </v-container>
+      <v-col cols="12" v-for="story in filterdStories" :key="story.id">
+        <StoryCard :story="story" />
       </v-col>
     </v-row>
+
+    <v-row v-if="selectedTab == 1">
+      <v-col cols="12" v-for="story in myStories" :key="story.id">
+        <StoryCard :story="story" />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="selectedTab == 2">
+      <v-col cols="12" v-for="story in favoriteStories" :key="story.id">
+        <StoryCard :story="story" />
+      </v-col>
+    </v-row>
+
+
   </v-container>
 </template>

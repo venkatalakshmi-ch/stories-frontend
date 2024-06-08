@@ -1,10 +1,9 @@
 <script setup>
 import { onMounted } from "vue";
-import { ref, toRaw } from "vue";
+import { ref, toRaw, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import ChatService from "../services/ChatServices.js";
 import StoryReports from "../reports/StoryReports.js";
-
 
 const router = useRouter();
 
@@ -183,6 +182,32 @@ async function saveFeedback() {
   }
 }
 
+async function onDeleteStory() {
+  // confirm dialog
+  if (!confirm("Are you sure you want to delete this story?")) {
+    return;
+  }
+  await ChatService.deleteStory(story.id)
+    .then(async () => {
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "Story deleted successfully!";
+      router.go(-1);
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+const editStory = async (story) => {
+  router.push({ name: "edit-story", params: { id: story.id } });
+};
+
+const canEditStory = computed(() => user.value !== null && (user.value.id === story.value.userId) || user.value.type === "admin");
+
 
 function closeSnackBar() {
   snackbar.value.value = false;
@@ -194,33 +219,45 @@ function closeSnackBar() {
     <div>
       <v-card v-if="story != null">
         <v-card-actions>
-          <v-card-title>{{ story.title }} <v-chip class="ma-2" color="primary" label>
-              <v-icon start icon="mdi-account-circle-outline"></v-icon>
-              {{ story.user.firstName }} {{ story.user.lastName }}
-            </v-chip>
-            <v-chip class="ma-2" :color="story.isPublished ? 'green' : 'red'" label>
-              <v-icon start icon="mdi-check-circle-outline"></v-icon>
-              {{ story.isPublished ? 'Published' : 'Unpublished' }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.genre.name }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.language.name }}
-            </v-chip>
-            <v-chip class="ma-2" color="blue" label>
-              {{ story.country.name }}
-            </v-chip>
+          <v-card-title>
+            {{ story.title }}
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-icon v-if="user !== null" size="large" color="primary" icon="mdi-file-pdf-box"
-            @click.stop="StoryReports.generateStoryPdf(story)"></v-icon> <v-btn v-if="!isFavoriteStory" size="large"
-            color="grey" icon="mdi-heart" @click="addFavorite" />
-          <v-btn v-if="isFavoriteStory" size="large" color="primary" icon="mdi-heart" @click="removeFavorite" />
+
+          <v-btn  v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete" @click="onDeleteStory"></v-btn>
+          <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil" @click="editStory"></v-btn>
+
+          <v-btn v-if="user !== null" size="large" color="green" icon="mdi-file-pdf-box"
+            @click.stop="StoryReports.generateStoryPdf(story)"></v-btn>
+
+          <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
+
+          <v-btn v-if="isFavoriteStory" size="large" color="pink" icon="mdi-heart" @click="removeFavorite" />
         </v-card-actions>
 
+        <v-card-title>
+          <v-chip class="mx-2" color="primary" label>
+            <v-icon start icon="mdi-account-circle-outline"></v-icon>
+            {{ story.user.firstName }} {{ story.user.lastName }}
+          </v-chip>
+          <v-chip class="mx-2" :color="story.isPublished ? 'green' : 'red'" label>
+            <v-icon start icon="mdi-check-circle-outline"></v-icon>
+            {{ story.isPublished ? 'Published' : 'Unpublished' }}
+          </v-chip>
+          <v-chip class="mx-2" color="cyan" label>
+            {{ story.genre.name }}
+          </v-chip>
+          <v-chip class="mx-2" color="cyan" label>
+            {{ story.language.name }}
+          </v-chip>
+          <v-chip class="mx-2" color="blue" label>
+            {{ story.country.name }}
+          </v-chip>
+        </v-card-title>
 
-        <v-card-text>
+
+
+        <v-card-text class="ma-2">
           {{ story.story }}
 
           <v-divider class="my-3"></v-divider>
