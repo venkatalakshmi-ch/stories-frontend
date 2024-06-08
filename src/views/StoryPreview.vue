@@ -3,6 +3,7 @@ import { onMounted } from "vue";
 import { ref, toRaw } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import ChatService from "../services/ChatServices.js";
+import StoryReports from "../reports/StoryReports.js";
 
 
 const router = useRouter();
@@ -183,10 +184,6 @@ async function saveFeedback() {
 }
 
 
-
-
-
-
 function closeSnackBar() {
   snackbar.value.value = false;
 }
@@ -204,49 +201,61 @@ function closeSnackBar() {
             <v-chip class="ma-2" :color="story.isPublished ? 'green' : 'red'" label>
               <v-icon start icon="mdi-check-circle-outline"></v-icon>
               {{ story.isPublished ? 'Published' : 'Unpublished' }}
-            </v-chip></v-card-title>
+            </v-chip>
+            <v-chip class="ma-2" color="blue" label>
+              {{ story.genre.name }}
+            </v-chip>
+            <v-chip class="ma-2" color="blue" label>
+              {{ story.language.name }}
+            </v-chip>
+            <v-chip class="ma-2" color="blue" label>
+              {{ story.country.name }}
+            </v-chip>
+          </v-card-title>
           <v-spacer></v-spacer>
-          <v-btn size="large"></v-btn>
-          <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
+          <v-icon v-if="user !== null" size="large" color="primary" icon="mdi-file-pdf-box"
+            @click.stop="StoryReports.generateStoryPdf(story)"></v-icon> <v-btn v-if="!isFavoriteStory" size="large"
+            color="grey" icon="mdi-heart" @click="addFavorite" />
           <v-btn v-if="isFavoriteStory" size="large" color="primary" icon="mdi-heart" @click="removeFavorite" />
         </v-card-actions>
 
 
         <v-card-text>
-        {{ story.story }}
+          {{ story.story }}
 
-        <v-divider class="my-3"></v-divider>
+          <v-divider class="my-3"></v-divider>
 
-        <v-card-title v-if="feedbacks.length>0">Feedbacks</v-card-title>
-        <v-list v-if="feedbacks.length>0">
-          <v-list-item  class="my-3"  v-for="item in feedbacks" :key="item.id">
+          <v-card-title v-if="feedbacks.length > 0">Feedbacks</v-card-title>
+          <v-list v-if="feedbacks.length > 0">
+            <v-list-item class="my-3" v-for="item in feedbacks" :key="item.id">
               <v-list-item-title>
                 <v-row>
                   <v-col cols="10">
                     {{ item.message }}
                   </v-col>
                   <v-col v-if="user.id === item.user.id" cols="2">
-                    <v-btn class="ma-2"  @click="editFeedback(item)">
+                    <v-btn class="ma-2" @click="editFeedback(item)">
                       <v-icon color="green">mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn  @click="deleteFeedback(item)">
+                    <v-btn @click="deleteFeedback(item)">
                       <v-icon color="red">mdi-delete</v-icon>
                     </v-btn>
                   </v-col>
                 </v-row>
               </v-list-item-title>
-              <v-list-item-subtitle> <v-spacer></v-spacer>{{ item.user.firstName }} {{ item.user.lastName }}</v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
+              <v-list-item-subtitle> <v-spacer></v-spacer>{{ item.user.firstName }} {{ item.user.lastName
+                }}</v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
 
-        <v-divider class="my-3"></v-divider>
+          <v-divider class="my-3"></v-divider>
 
-        <v-text-field v-model="feedback.message" label="Add Feedback" outlined></v-text-field>
+          <v-text-field v-model="feedback.message" label="Add Feedback" outlined></v-text-field>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="flat" @click="addFeedback" color="primary">Add Feedback</v-btn>
-        </v-card-actions>        
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="flat" @click="addFeedback" color="primary">Add Feedback</v-btn>
+          </v-card-actions>
         </v-card-text>
 
         <v-dialog v-model="openEditDialog" max-width="500px">
@@ -270,7 +279,6 @@ function closeSnackBar() {
 
 
 <style scoped>
-
 .v-list-item {
   background-color: #e0ecd7;
   border-radius: 10px;
