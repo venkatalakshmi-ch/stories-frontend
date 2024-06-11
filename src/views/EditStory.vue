@@ -54,9 +54,22 @@ async function getStory(id) {
         });
 }
 
+const showLoader = ref(false);
+
+
 async function sendMesage() {
+
+    showLoader.value = true;
     console.log(chat.value);
     chat.value.storyId = selectedStory.value.id;
+    let message = chat.value.message;
+
+    message = message + " Genre: " + selectedStory.value.genre.name + ".";
+    message = message + " Country: " + selectedStory.value.country.name+ ".";
+    message = message + " Language: " + selectedStory.value.language.name+ ".";
+
+    chat.value.message = message;
+
     await ChatServices.sendChatMessage(chat.value)
         .then(async () => {
             await getChatHistory();
@@ -79,6 +92,7 @@ async function sendMesage() {
 async function getChatHistory() {
     await ChatServices.getChatHistory(router.currentRoute.value.params.id)
         .then((response) => {
+            showLoader.value = false;
             chatHistory.value = response.data;
             window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
         })
@@ -140,10 +154,12 @@ async function publishStory(story) {
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn variant="flat" color="primary" @click="sendMesage">Send</v-btn>
+                <v-progress-circular v-if="showLoader" color="primary" indeterminate :size="20" :width="2"></v-progress-circular>
+                <v-btn v-else variant="flat" color="primary" @click="sendMesage">Send</v-btn>
             </v-card-actions>
         </v-card>
     </v-container>
+
 
 
     <v-snackbar v-model="snackbar.value" rounded="pill">
