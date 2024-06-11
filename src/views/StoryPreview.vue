@@ -187,7 +187,7 @@ async function onDeleteStory() {
   if (!confirm("Are you sure you want to delete this story?")) {
     return;
   }
-  await ChatService.deleteStory(story.id)
+  await ChatService.deleteStory(story.value.id)
     .then(async () => {
       snackbar.value.value = true;
       snackbar.value.color = "green";
