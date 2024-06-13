@@ -212,6 +212,22 @@ const canEditStory = computed(() => user.value !== null && (user.value.id === st
 function closeSnackBar() {
   snackbar.value.value = false;
 }
+
+function dateFormatted(updatedAt) {
+  const date = new Date(updatedAt);
+
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+
+  const formattedDate = date.toLocaleDateString('en-US', options);
+
+  return formattedDate;
+}
 </script>
 
 <template>
@@ -224,8 +240,10 @@ function closeSnackBar() {
           </v-card-title>
           <v-spacer></v-spacer>
 
-          <v-btn  v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete" @click="onDeleteStory"></v-btn>
-          <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil" @click="editStory"></v-btn>
+          <v-btn v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete"
+            @click="onDeleteStory"></v-btn>
+          <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil"
+            @click="editStory"></v-btn>
 
           <v-btn v-if="user !== null" size="large" color="green" icon="mdi-file-pdf-box"
             @click.stop="StoryReports.generateStoryPdf(story)"></v-btn>
@@ -257,9 +275,15 @@ function closeSnackBar() {
 
 
 
-        <v-card-text class="ma-2">
+        <v-card-text class="ma-2" style="font-weight: bold; color: grey;">
           {{ story.story }}
 
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <span class="grey--text" style="font-weight: bold; font-size:8; font-style: italic;">
+              {{ dateFormatted(story.updatedAt) }}
+            </span>
+          </v-card-actions>
           <v-divider class="my-3"></v-divider>
 
           <v-card-title v-if="feedbacks.length > 0">Feedbacks</v-card-title>
@@ -270,18 +294,29 @@ function closeSnackBar() {
                   <v-col cols="10">
                     {{ item.message }}
                   </v-col>
-                  <v-col v-if="user.id === item.user.id" cols="2">
-                    <v-btn class="ma-2" @click="editFeedback(item)">
-                      <v-icon color="green">mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn @click="deleteFeedback(item)">
-                      <v-icon color="red">mdi-delete</v-icon>
-                    </v-btn>
+                  <v-col align="right" v-if="user.id === item.user.id" cols="2">
+                    <v-icon class="mx-4" @click="editFeedback(item)" color="grey">mdi-pencil</v-icon>
+                    <v-icon @click="deleteFeedback(item)" color="grey">mdi-delete</v-icon>
                   </v-col>
                 </v-row>
               </v-list-item-title>
-              <v-list-item-subtitle> <v-spacer></v-spacer>{{ item.user.firstName }} {{ item.user.lastName
-                }}</v-list-item-subtitle>
+              <br>
+
+              <v-list-item-subtitle>
+                <v-row align="center">
+                  <v-col cols="9">
+                    <v-chip color="black" label>
+                      <v-icon start icon="mdi-account-circle-outline"></v-icon>
+                      {{ item.user.firstName }} {{ item.user.lastName }}
+                    </v-chip>
+                  </v-col>
+                  <v-col align="right" cols="3">
+                    <span class="grey--text" style="font-weight: normal; font-size:8; font-style: italic;">
+                      {{ dateFormatted(item.updatedAt) }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
             </v-list-item>
           </v-list>
 

@@ -86,7 +86,7 @@ function changePassword() {
 
 <template>
   <div>
-    <v-app-bar color="primary" app dark>
+    <v-app-bar color="primary" class="pr-3" dark>
 
       <v-app-bar-nav-icon v-if="user !== null" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
@@ -157,13 +157,6 @@ function changePassword() {
             Profile
           </v-btn>
         </v-list-item>
-
-        <v-list-item>
-          <v-btn block variant="tonal" @click="changePassword()">
-            Change Password
-          </v-btn>
-        </v-list-item>
-
       </v-list>
 
       <v-list v-else>
@@ -180,11 +173,6 @@ function changePassword() {
           </v-btn>
         </v-list-item>
 
-        <v-list-item>
-          <v-btn block variant="tonal" @click="changePassword()">
-            Change Password
-          </v-btn>
-        </v-list-item>
       </v-list>
 
     </v-navigation-drawer>
