@@ -27,6 +27,9 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+function changePassword() {
+  router.push({ name: "change-password" });
+}
 
 
 function updateAccount() {
@@ -67,6 +70,9 @@ function updateAccount() {
 
       </v-card-text>
       <v-card-actions>
+        <v-btn  color="primary" @click="changePassword()">
+          Change Password
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn variant="flat" color="primary" @click="updateAccount()">Update profile</v-btn>
       </v-card-actions>

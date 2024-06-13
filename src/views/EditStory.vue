@@ -7,6 +7,8 @@ import { useRouter, useRoute } from "vue-router";
 import ChatServices from "../services/ChatServices";
 const router = useRouter();
 const route = useRoute();
+import StoryCard from "../components/StoryCard.vue";
+
 const snackbar = ref({
     value: false,
     color: "",
@@ -65,8 +67,8 @@ async function sendMesage() {
     let message = chat.value.message;
 
     message = message + " Genre: " + selectedStory.value.genre.name + ".";
-    message = message + " Country: " + selectedStory.value.country.name+ ".";
-    message = message + " Language: " + selectedStory.value.language.name+ ".";
+    message = message + " Country: " + selectedStory.value.country.name + ".";
+    message = message + " Language: " + selectedStory.value.language.name + ".";
 
     chat.value.message = message;
 
@@ -128,6 +130,12 @@ async function publishStory(story) {
 
 <template>
     <v-container>
+
+        <StoryCard class="my-5" v-if="selectedStory != null" :story="selectedStory" />
+
+        
+
+        <br>
         <v-card class="rounded-lg elevation-5">
             <v-card-title class="headline mx-2 my-2">
                 <v-row align="center" justify="space-between">
@@ -154,7 +162,8 @@ async function publishStory(story) {
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-progress-circular v-if="showLoader" color="primary" indeterminate :size="20" :width="2"></v-progress-circular>
+                <v-progress-circular v-if="showLoader" color="primary" indeterminate :size="20"
+                    :width="2"></v-progress-circular>
                 <v-btn v-else variant="flat" color="primary" @click="sendMesage">Send</v-btn>
             </v-card-actions>
         </v-card>
