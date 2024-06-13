@@ -237,7 +237,6 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 </script>
-
 <template>
   <v-app-bar color="primary" class="pr-3" dark>
 

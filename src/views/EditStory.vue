@@ -8,6 +8,10 @@ import ChatServices from "../services/ChatServices";
 const router = useRouter();
 const route = useRoute();
 import StoryCard from "../components/StoryCard.vue";
+import GenreService from "../services/GenreService";
+import LanguageService from "../services/LanguageService";
+import CountriesService from "../services/CountriesService";
+
 
 const snackbar = ref({
     value: false,
@@ -89,7 +93,22 @@ async function sendMesage() {
 }
 
 
+function cleanChat(message) {
+    if (message === null || message === undefined || message === "") {
+        return "";
+    }
 
+    let index = message.indexOf("Genre:");
+    if (index !== -1) {
+        message = message.substring(0, index);
+        return message;
+    }
+    else {
+        return message;
+    }
+
+
+}
 
 async function getChatHistory() {
     await ChatServices.getChatHistory(router.currentRoute.value.params.id)
@@ -124,6 +143,51 @@ async function publishStory(story) {
         });
 }
 
+
+
+const languages = ref([]);
+const genres = ref([]);
+const countries = ref([]);
+
+
+
+async function getGenres() {
+    try {
+        const response = await GenreService.getGenres();
+        genres.value = response.data;
+        // selectedGenreFilterId.value = genres.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get genres";
+    }
+}
+
+async function getLanguages() {
+    try {
+        const response = await LanguageService.getLanguages();
+        languages.value = response.data;
+        // selectedLanguageFilterId.value = languages.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get languages";
+    }
+}
+
+async function getCountries() {
+    try {
+        const response = await CountriesService.getCountries();
+        countries.value = response.data;
+        // selectedCountryFilterId.value = countries.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get countries";
+    }
+}
+
+
 </script>
 
 
@@ -133,7 +197,7 @@ async function publishStory(story) {
 
         <StoryCard class="my-5" v-if="selectedStory != null" :story="selectedStory" />
 
-        
+
 
         <br>
         <v-card class="rounded-lg elevation-5">
@@ -146,7 +210,7 @@ async function publishStory(story) {
             <v-card-text class="chat-container">
                 <div v-for="(chat, index) in chatHistory" :key="index" class="chat-message"
                     :class="{ 'user-message': chat.role === 'User', 'chatbot-message': chat.role === 'Chatbot' }">
-                    <p>{{ chat.message }}</p>
+                    <p>{{ cleanChat(chat.message) }}</p>
 
                     <v-card-actions v-if="chat.role === 'Chatbot'">
                         <v-spacer></v-spacer>
