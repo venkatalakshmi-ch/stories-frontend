@@ -275,12 +275,12 @@ function dateFormatted(updatedAt) {
 
 
 
-        <v-card-text class="ma-2" style="font-weight: bold; color: grey;">
+        <v-card-text class="ma-2" style="font-weight: bold; color: grey; text-align: justify;">
           {{ story.story }}
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <span class="grey--text" style="font-weight: bold; font-size:8; font-style: italic;">
+            <span class="grey--text" style="font-weight: bold; font-size:8; font-style: italic; ">
               {{ dateFormatted(story.updatedAt) }}
             </span>
           </v-card-actions>
