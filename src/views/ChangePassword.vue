@@ -19,13 +19,14 @@ onMounted(async () => {
 });
 
 const password = ref({
+  oldPassword: "",
   newPassword: "",
   confirmPassword: "",
 });
 
 
 async function changePassword() {
-  if (password.value.newPassword === "" || password.value.confirmPassword === "") {
+  if (password.value.newPassword === "" || password.value.confirmPassword === "" || password.value.oldPassword === "") {
     snackbar.value.value = true;
     snackbar.value.color = "error";
     snackbar.value.text = "Please fill in all fields";
@@ -39,14 +40,14 @@ async function changePassword() {
   }
 
   try {
-    const response = await UserServices.changePassword(user.value.id, password.value.newPassword);
+    const response = await UserServices.changePassword(user.value.id,password.value.oldPassword, password.value.newPassword);
     snackbar.value.value = true;
     snackbar.value.color = "green";
     snackbar.value.text = "Password changed successfully";
   } catch (error) {
     snackbar.value.value = true;
     snackbar.value.color = "error";
-    snackbar.value.text = "Failed to change password";
+    snackbar.value.text = error.response.data.message;
   }
 }
 
@@ -62,8 +63,8 @@ function closeSnackBar() {
       <v-card class="rounded-lg elevation-5">
         <v-card-title class="headline mb-2">Change Password</v-card-title>
         <v-card-text>
+          <v-text-field type="password" v-model="password.oldPassword" label="Old Password" required></v-text-field>
           <v-text-field type="password" v-model="password.newPassword" label="New Password" required></v-text-field>
-
           <v-text-field type="password" v-model="password.confirmPassword" label="Confirm Password" required></v-text-field>
         </v-card-text>
         <v-card-actions>
