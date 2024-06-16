@@ -75,7 +75,9 @@ function showPreview(story) {
                     <v-chip class="ma-2" color="blue" label>
                         {{ story.country.name }}
                     </v-chip>
-
+                    <v-chip class="ma-2" color="blue" label>
+                        {{ story.ageGroup.description }}
+                    </v-chip>
                 </v-col>
             </v-row>
         </v-card-title>

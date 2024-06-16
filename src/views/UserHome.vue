@@ -7,6 +7,7 @@ import StoryCard from "../components/StoryCard.vue";
 import GenreService from "../services/GenreService";
 import LanguageService from "../services/LanguageService";
 import CountriesService from "../services/CountriesService";
+import AgeGroupService from "../services/AgeGroupService";
 
 const router = useRouter();
 
@@ -20,10 +21,13 @@ const snackbar = ref({
 const languages = ref([]);
 const genres = ref([]);
 const countries = ref([]);
+const ageGroups = ref([]);
+
 
 const selectedGenreFilterId = ref(null);
 const selectedLanguageFilterId = ref(null);
 const selectedCountryFilterId = ref(null);
+const selectedAgeGroupFilterId = ref(null);
 
 const user = ref({});
 
@@ -38,6 +42,7 @@ onMounted(async () => {
   await getCountries();
   await getMyStories();
   await getFavoriteStories();
+  await getAgeGroups();
 }
 );
 
@@ -47,6 +52,18 @@ function editStory(createdStory) {
 
 
 const stories = ref([]);
+
+async function getAgeGroups() {
+  try {
+    const response = await AgeGroupService.getAgeGroups();
+    ageGroups.value = response.data;
+    // selectedAgeGroupFilterId.value = ageGroups.value[0].id;
+  } catch (error) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Failed to get age groups";
+  }
+}
 
 async function getStories() {
   try {
@@ -112,7 +129,9 @@ function filterStories() {
       (selectedLanguageFilterId.value === null ||
         story.language.id === selectedLanguageFilterId.value) &&
       (selectedCountryFilterId.value === null ||
-        story.country.id === selectedCountryFilterId.value)
+        story.country.id === selectedCountryFilterId.value) &&
+      (selectedAgeGroupFilterId.value === null ||
+        story.ageGroup.id === selectedAgeGroupFilterId.value)
     );
   });
 
@@ -130,6 +149,10 @@ async function onLanguageFilterChange() {
 }
 
 async function onCountryFilterChange() {
+  filterStories();
+}
+
+async function onAgeGroupFilterChange() {
   filterStories();
 }
 
@@ -181,6 +204,7 @@ const story = ref({
   genreId: null,
   languageId: null,
   countryId: null,
+  ageGroupId: null,
 });
 
 async function createStory() {
@@ -210,6 +234,13 @@ if (story.value.countryId === null) {
   snackbar.value.value = true;
   snackbar.value.color = "error";
   snackbar.value.text = "Country is required!";
+  return;
+}
+
+if (story.value.ageGroupId === null) {
+  snackbar.value.value = true;
+  snackbar.value.color = "error";
+  snackbar.value.text = "Age group is required!";
   return;
 }
 
@@ -260,17 +291,22 @@ function closeSnackBar() {
         <v-card>
           <v-card-title>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-select v-model="selectedGenreFilterId" :items="genres" label="Genre" item-title="name"
                   item-value="id" @update:modelValue="onGenreFilterChange"></v-select>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-select v-model="selectedLanguageFilterId" :items="languages" label="Language" item-title="name"
                   item-value="id" @update:modelValue="onLanguageFilterChange"></v-select>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-select v-model="selectedCountryFilterId" :items="countries" label="Country" item-title="name"
                   item-value="id" @update:modelValue="onCountryFilterChange"></v-select>
+              </v-col>
+
+              <v-col cols="3">
+                <v-select v-model="selectedAgeGroupFilterId" :items="ageGroups" label="Age Group" item-title="description"
+                  item-value="id" @update:modelValue="onAgeGroupFilterChange"></v-select>
               </v-col>
             </v-row>
           </v-card-title>
@@ -298,16 +334,21 @@ function closeSnackBar() {
         <v-card class="rounded-lg elevation-5">
           <v-card-title class="headline mb-2">Stories </v-card-title>
           <v-row class="mx-2">
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.genreId" :items="genres" item-title="name" item-value="id" label="Genre"
                 required></v-select>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.languageId" :items="languages" item-title="name" item-value="id" label="Language"
                 required></v-select>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.countryId" :items="countries" item-title="name" item-value="id" label="Country"
+                required></v-select>
+            </v-col>
+
+            <v-col cols="12" md="3">
+              <v-select v-model="story.ageGroupId" :items="ageGroups" item-title="name" item-value="id" label="Age Group"
                 required></v-select>
             </v-col>
           </v-row>

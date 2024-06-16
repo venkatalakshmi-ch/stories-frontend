@@ -263,17 +263,17 @@ async function generatePDF() {
             <v-spacer></v-spacer>
             <div data-html2canvas-ignore="true">
 
-            <v-btn v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete"
-              @click="onDeleteStory"></v-btn>
-            <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil"
-              @click="editStory"></v-btn>
+              <v-btn v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete"
+                @click="onDeleteStory"></v-btn>
+              <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil"
+                @click="editStory"></v-btn>
 
-            <v-btn v-if="user !== null" size="large" color="green" icon="mdi-file-pdf-box"
-              @click.stop="generatePDF()"></v-btn>
+              <v-btn v-if="user !== null" size="large" color="green" icon="mdi-file-pdf-box"
+                @click.stop="generatePDF()"></v-btn>
 
-            <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
+              <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
 
-            <v-btn v-if="isFavoriteStory" size="large" color="pink" icon="mdi-heart" @click="removeFavorite" />
+              <v-btn v-if="isFavoriteStory" size="large" color="pink" icon="mdi-heart" @click="removeFavorite" />
             </div>
           </v-card-actions>
 
@@ -294,6 +294,9 @@ async function generatePDF() {
             </v-chip>
             <v-chip class="mx-2" color="blue" label>
               {{ story.country.name }}
+            </v-chip>
+            <v-chip class="ma-2" color="blue" label>
+              {{ story.ageGroup.description }}
             </v-chip>
           </v-card-title>
 

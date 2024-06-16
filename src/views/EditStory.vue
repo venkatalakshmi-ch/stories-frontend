@@ -11,6 +11,7 @@ import StoryCard from "../components/StoryCard.vue";
 import GenreService from "../services/GenreService";
 import LanguageService from "../services/LanguageService";
 import CountriesService from "../services/CountriesService";
+import AgeGroupService from "../services/AgeGroupService";
 
 
 const snackbar = ref({
@@ -72,7 +73,8 @@ async function sendMesage() {
 
     message = message + " Genre: " + selectedStory.value.genre.name + ".";
     message = message + " Country: " + selectedStory.value.country.name + ".";
-    message = message + " Language: " + selectedStory.value.language.name + ". Dont include title in the story.";
+    message = message + " Language: " + selectedStory.value.language.name +".";
+    message = message + " Age Group: " + selectedStory.value.ageGroup.description + ". Dont include title in the story.";
 
     chat.value.message = message;
 

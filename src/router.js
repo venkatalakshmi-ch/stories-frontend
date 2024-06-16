@@ -53,7 +53,12 @@ const router = createRouter({
       path:"/change-password",
       name:"change-password",
       component: () => import("./views/ChangePassword.vue"),
-    }
+    },
+    { 
+      path:"/age-groups",
+      name:"age-groups",
+      component: () => import("./views/AgeGroups.vue"),
+    },
 
   ],
 });
