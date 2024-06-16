@@ -82,6 +82,10 @@ function changePassword() {
   router.push({ name: "change-password" });
 }
 
+function showAgeGroups() {
+  router.push({ name: "age-groups" });
+}
+
 </script>
 
 <template>
@@ -149,6 +153,12 @@ function changePassword() {
         <v-list-item>
           <v-btn block variant="tonal" @click="showGenres()">
             Genres
+          </v-btn>
+        </v-list-item>
+
+        <v-list-item>
+          <v-btn block variant="tonal" @click="showAgeGroups()">
+            Age Groups
           </v-btn>
         </v-list-item>
 

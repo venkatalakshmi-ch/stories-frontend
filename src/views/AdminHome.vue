@@ -7,6 +7,7 @@ import StoryCard from "../components/StoryCard.vue";
 import GenreService from "../services/GenreService";
 import LanguageService from "../services/LanguageService";
 import CountriesService from "../services/CountriesService";
+import AgeGroupService from "../services/AgeGroupService";
 
 
 
@@ -21,6 +22,7 @@ const snackbar = ref({
 const languages = ref([]);
 const genres = ref([]);
 const countries = ref([]);
+const agegroups = ref([]);
 
 const stories = ref([]);
 
@@ -38,6 +40,7 @@ const story = ref({
   genreId: null,
   languageId: null,
   countryId: null,
+  ageGroupId: null,
 });
 
 
@@ -76,6 +79,12 @@ async function createStory() {
     return;
   }
 
+  if (story.value.ageGroupId === null) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "Age group is required!";
+    return;
+  }
 
   story.value.userId = user.value.id;
 
@@ -125,8 +134,23 @@ onMounted(async () => {
   await getCountries();
   await getMyStories();
   await getFavoriteStories();
+  await getAgeGroups();
 
 });
+
+async function getAgeGroups() {
+  await AgeGroupService.getAgeGroups()
+    .then((response) => {
+      agegroups.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
 
 async function getMyStories() {
   await ChatServices.getStoriesByUser(user.value.id)
@@ -276,17 +300,22 @@ function editStory(createdStory) {
         <v-card class="rounded-lg elevation-5">
           <v-card-title class="headline mb-2">Stories </v-card-title>
           <v-row class="mx-2">
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.genreId" :items="genres" item-title="name" item-value="id" label="Genre"
                 required></v-select>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.languageId" :items="languages" item-title="name" item-value="id" label="Language"
                 required></v-select>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-select v-model="story.countryId" :items="countries" item-title="name" item-value="id" label="Country"
                 required></v-select>
+            </v-col>
+
+            <v-col cols="12" md="3">
+              <v-select v-model="story.ageGroupId" :items="agegroups" item-title="description" item-value="id"
+                label="Age group" required></v-select>
             </v-col>
           </v-row>
           <v-card-text>

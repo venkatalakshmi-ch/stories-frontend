@@ -11,6 +11,7 @@ import StoryCard from "../components/StoryCard.vue";
 import GenreService from "../services/GenreService";
 import LanguageService from "../services/LanguageService";
 import CountriesService from "../services/CountriesService";
+import AgeGroupService from "../services/AgeGroupService";
 
 
 const snackbar = ref({
@@ -72,7 +73,8 @@ async function sendMesage() {
 
     message = message + " Genre: " + selectedStory.value.genre.name + ".";
     message = message + " Country: " + selectedStory.value.country.name + ".";
-    message = message + " Language: " + selectedStory.value.language.name + ".";
+    message = message + " Language: " + selectedStory.value.language.name +".";
+    message = message + " Age Group: " + selectedStory.value.ageGroup.description + ". Dont include title in the story.";
 
     chat.value.message = message;
 
@@ -116,6 +118,11 @@ async function getChatHistory() {
             showLoader.value = false;
             chatHistory.value = response.data;
             window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+
+            if (chatHistory.value.length === 0) {
+                chat.value.message = "Write a story. Title: " +selectedStory.value.title +".";   
+                sendMesage();
+            }
         })
         .catch((error) => {
             console.log(error);
@@ -196,7 +203,6 @@ async function getCountries() {
     <v-container>
 
         <StoryCard class="my-5" v-if="selectedStory != null" :story="selectedStory" />
-
 
 
         <br>
