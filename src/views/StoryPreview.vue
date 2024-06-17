@@ -277,7 +277,7 @@ async function generatePDF() {
             </div>
           </v-card-actions>
 
-          <v-card-title>
+          <v-card-title data-html2canvas-ignore="true">
             <v-chip class="mx-2" color="primary" label>
               <v-icon start icon="mdi-account-circle-outline"></v-icon>
               {{ story.user.firstName }} {{ story.user.lastName }}
