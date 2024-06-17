@@ -7,6 +7,13 @@ import { useRouter, useRoute } from "vue-router";
 import ChatServices from "../services/ChatServices";
 const router = useRouter();
 const route = useRoute();
+import StoryCard from "../components/StoryCard.vue";
+import GenreService from "../services/GenreService";
+import LanguageService from "../services/LanguageService";
+import CountriesService from "../services/CountriesService";
+import AgeGroupService from "../services/AgeGroupService";
+
+
 const snackbar = ref({
     value: false,
     color: "",
@@ -54,9 +61,23 @@ async function getStory(id) {
         });
 }
 
+const showLoader = ref(false);
+
+
 async function sendMesage() {
-    console.log(chat.value);
+
+    showLoader.value = true;
+
     chat.value.storyId = selectedStory.value.id;
+    let message = chat.value.message;
+
+    message = message + " Genre: " + selectedStory.value.genre.name + ".";
+    message = message + " Country: " + selectedStory.value.country.name + ".";
+    message = message + " Language: " + selectedStory.value.language.name +".";
+    message = message + " Age Group: " + selectedStory.value.ageGroup.description + ". Dont include title in the story.";
+
+    chat.value.message = message;
+
     await ChatServices.sendChatMessage(chat.value)
         .then(async () => {
             await getChatHistory();
@@ -74,13 +95,34 @@ async function sendMesage() {
 }
 
 
+function cleanChat(message) {
+    if (message === null || message === undefined || message === "") {
+        return "";
+    }
 
+    let index = message.indexOf("Genre:");
+    if (index !== -1) {
+        message = message.substring(0, index);
+        return message;
+    }
+    else {
+        return message;
+    }
+
+
+}
 
 async function getChatHistory() {
     await ChatServices.getChatHistory(router.currentRoute.value.params.id)
         .then((response) => {
+            showLoader.value = false;
             chatHistory.value = response.data;
             window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+
+            if (chatHistory.value.length === 0) {
+                chat.value.message = "Write a story. Title: " +selectedStory.value.title +".";   
+                sendMesage();
+            }
         })
         .catch((error) => {
             console.log(error);
@@ -108,12 +150,62 @@ async function publishStory(story) {
         });
 }
 
+
+
+const languages = ref([]);
+const genres = ref([]);
+const countries = ref([]);
+
+
+
+async function getGenres() {
+    try {
+        const response = await GenreService.getGenres();
+        genres.value = response.data;
+        // selectedGenreFilterId.value = genres.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get genres";
+    }
+}
+
+async function getLanguages() {
+    try {
+        const response = await LanguageService.getLanguages();
+        languages.value = response.data;
+        // selectedLanguageFilterId.value = languages.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get languages";
+    }
+}
+
+async function getCountries() {
+    try {
+        const response = await CountriesService.getCountries();
+        countries.value = response.data;
+        // selectedCountryFilterId.value = countries.value[0].id;
+    } catch (error) {
+        snackbar.value.value = true;
+        snackbar.value.color = "error";
+        snackbar.value.text = "Failed to get countries";
+    }
+}
+
+
 </script>
 
 
 
 <template>
     <v-container>
+
+        <StoryCard class="my-5" v-if="selectedStory != null" :story="selectedStory" />
+
+
+        <br>
         <v-card class="rounded-lg elevation-5">
             <v-card-title class="headline mx-2 my-2">
                 <v-row align="center" justify="space-between">
@@ -124,7 +216,7 @@ async function publishStory(story) {
             <v-card-text class="chat-container">
                 <div v-for="(chat, index) in chatHistory" :key="index" class="chat-message"
                     :class="{ 'user-message': chat.role === 'User', 'chatbot-message': chat.role === 'Chatbot' }">
-                    <p>{{ chat.message }}</p>
+                    <p>{{ cleanChat(chat.message) }}</p>
 
                     <v-card-actions v-if="chat.role === 'Chatbot'">
                         <v-spacer></v-spacer>
@@ -140,10 +232,13 @@ async function publishStory(story) {
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn variant="flat" color="primary" @click="sendMesage">Send</v-btn>
+                <v-progress-circular v-if="showLoader" color="primary" indeterminate :size="20"
+                    :width="2"></v-progress-circular>
+                <v-btn v-else variant="flat" color="primary" @click="sendMesage">Send</v-btn>
             </v-card-actions>
         </v-card>
     </v-container>
+
 
 
     <v-snackbar v-model="snackbar.value" rounded="pill">

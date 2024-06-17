@@ -28,7 +28,7 @@ export default {
     return apiClient.put("users/" + user.id, user);
   },
 
-  changePassword(userId, password) {
-    return apiClient.put("users/" + userId + "/change-password", {password: password});
+  changePassword(userId,oldPassword, password) {
+    return apiClient.put("users/" + userId + "/change-password", { oldPassword:oldPassword,password: password});
   }
 };

@@ -24,6 +24,7 @@ function logout() {
   router.push({ name: "login" });
 }
 
+const isAdmin = ref(false);
 
 onMounted(() => {
   logoURL.value = ocLogo;
@@ -33,6 +34,7 @@ onMounted(() => {
   } else {
     if (user.value.type === "admin") {
       title.value = "Admin Dashboard";
+      isAdmin.value = true;
     }
     else {
       title.value = "User Dashboard";
@@ -45,7 +47,18 @@ const drawer = ref(false);
 
 
 function showStories() {
-  router.push({ name: "admin-home" });
+  if (user.value === null) {
+    router.push({ name: "login" });
+  }
+  else {
+    if (isAdmin.value) {
+      router.push({ name: "admin-home" });
+      drawer.value = false;
+    } else {
+      router.push({ name: "user-home" });
+      drawer.value = false;
+    }
+  }
 }
 
 function showLanguages() {
@@ -69,34 +82,23 @@ function changePassword() {
   router.push({ name: "change-password" });
 }
 
+function showAgeGroups() {
+  router.push({ name: "age-groups" });
+}
+
 </script>
 
 <template>
   <div>
-    <v-app-bar color="primary" app dark>
-      <!-- <router-link :to="{ name: 'stories' }">
-        <v-img
-          class="mx-2"
-          :src="logoURL"
-          height="50"
-          width="50"
-          contain
-        ></v-img>
-      </router-link> -->
+    <v-app-bar color="primary" class="pr-3" dark>
 
-      <v-app-bar-nav-icon v-if="user !== null && user.type === 'admin'" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="user !== null" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title class="title">
+      <v-toolbar-title class="title" @click="showStories">
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- <v-btn class="mx-2" :to="{ name: 'stories' }"> Stories </v-btn> -->
-      <v-btn v-if="user === null" class="mx-2" :to="{ name: 'login' }">
-        Login
-      </v-btn>
-      <!-- <v-btn v-if="user !== null" class="mx-2" :to="{ name: 'ingredients' }">
-        Ingredients
-      </v-btn> -->
+
       <v-menu v-if="user !== null" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
@@ -128,14 +130,15 @@ function changePassword() {
     </v-app-bar>
 
 
-    <v-navigation-drawer v-if="user !== null && user.type === 'admin'" v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
-      <v-list nav dense>
+    <v-navigation-drawer v-if="user !== null" v-model="drawer"
+      :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+      <v-list v-if="isAdmin" nav dense>
         <v-list-item>
           <v-btn block variant="tonal" @click="showStories()">
-            Stories
+            Home
           </v-btn>
         </v-list-item>
-        
+
         <v-list-item>
           <v-btn block variant="tonal" @click="showLanguages()">
             Languages
@@ -154,18 +157,34 @@ function changePassword() {
         </v-list-item>
 
         <v-list-item>
+          <v-btn block variant="tonal" @click="showAgeGroups()">
+            Age Groups
+          </v-btn>
+        </v-list-item>
+
+        <v-list-item>
+          <v-btn block variant="tonal" @click="showProfile()">
+            Profile
+          </v-btn>
+        </v-list-item>
+      </v-list>
+
+      <v-list v-else>
+
+        <v-list-item>
+          <v-btn block variant="tonal" @click="showStories()">
+            Home
+          </v-btn>
+        </v-list-item>
+
+        <v-list-item>
           <v-btn block variant="tonal" @click="showProfile()">
             Profile
           </v-btn>
         </v-list-item>
 
-        <v-list-item>
-          <v-btn block variant="tonal" @click="changePassword()">
-            Change Password
-          </v-btn>
-        </v-list-item>
-
       </v-list>
+
     </v-navigation-drawer>
 
 

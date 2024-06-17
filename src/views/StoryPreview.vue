@@ -1,10 +1,11 @@
 <script setup>
 import { onMounted } from "vue";
-import { ref, toRaw } from "vue";
+import { ref, toRaw, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import ChatService from "../services/ChatServices.js";
-import StoryReports from "../reports/StoryReports.js";
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const router = useRouter();
 
@@ -183,48 +184,139 @@ async function saveFeedback() {
   }
 }
 
+async function onDeleteStory() {
+  // confirm dialog
+  if (!confirm("Are you sure you want to delete this story?")) {
+    return;
+  }
+  await ChatService.deleteStory(story.value.id)
+    .then(async () => {
+      snackbar.value.value = true;
+      snackbar.value.color = "green";
+      snackbar.value.text = "Story deleted successfully!";
+      router.go(-1);
+    })
+    .catch((error) => {
+      console.log(error);
+      snackbar.value.value = true;
+      snackbar.value.color = "error";
+      snackbar.value.text = error.response.data.message;
+    });
+}
+
+const editStory = async (story) => {
+  router.push({ name: "edit-story", params: { id: story.id } });
+};
+
+const canEditStory = computed(() => user.value !== null && (user.value.id === story.value.userId) || user.value.type === "admin");
+
 
 function closeSnackBar() {
   snackbar.value.value = false;
 }
+
+function dateFormatted(updatedAt) {
+  const date = new Date(updatedAt);
+
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+
+  const formattedDate = date.toLocaleDateString('en-US', options);
+
+  return formattedDate;
+}
+
+async function generatePDF() {
+  const content = document.getElementById('pdf-area');
+
+  try {
+    const canvas = await html2canvas(content, { scale: 2 }); // Adjust scale as needed
+    const imgData = canvas.toDataURL('image/png');
+    const doc = new jsPDF();
+    const imgWidth = doc.internal.pageSize.getWidth();
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    doc.save(`${story.value.title}.pdf`);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    // Handle errors gracefully (e.g., display error message to user)
+  }
+}
+
+
 </script>
 
 <template>
   <v-container>
     <div>
       <v-card v-if="story != null">
-        <v-card-actions>
-          <v-card-title>{{ story.title }} <v-chip class="ma-2" color="primary" label>
+        <v-container id="pdf-area">
+          <v-card-actions>
+            <v-card-title>
+              {{ story.title }}
+            </v-card-title>
+            <v-spacer></v-spacer>
+            <div data-html2canvas-ignore="true">
+
+              <v-btn v-if="canEditStory" size="large" class="mx-2" color="grey" icon="mdi-delete"
+                @click="onDeleteStory"></v-btn>
+              <v-btn v-if="canEditStory" size="large" class="mx-2" color="blue" icon="mdi-pencil"
+                @click="editStory"></v-btn>
+
+              <v-btn v-if="user !== null" size="large" color="green" icon="mdi-file-pdf-box"
+                @click.stop="generatePDF()"></v-btn>
+
+              <v-btn v-if="!isFavoriteStory" size="large" color="grey" icon="mdi-heart" @click="addFavorite" />
+
+              <v-btn v-if="isFavoriteStory" size="large" color="pink" icon="mdi-heart" @click="removeFavorite" />
+            </div>
+          </v-card-actions>
+
+          <v-card-title data-html2canvas-ignore="true">
+            <v-chip class="mx-2" color="primary" label>
               <v-icon start icon="mdi-account-circle-outline"></v-icon>
               {{ story.user.firstName }} {{ story.user.lastName }}
             </v-chip>
-            <v-chip class="ma-2" :color="story.isPublished ? 'green' : 'red'" label>
+            <v-chip class="mx-2" :color="story.isPublished ? 'green' : 'red'" label>
               <v-icon start icon="mdi-check-circle-outline"></v-icon>
               {{ story.isPublished ? 'Published' : 'Unpublished' }}
             </v-chip>
-            <v-chip class="ma-2" color="blue" label>
+            <v-chip class="mx-2" color="cyan" label>
               {{ story.genre.name }}
             </v-chip>
-            <v-chip class="ma-2" color="blue" label>
+            <v-chip class="mx-2" color="cyan" label>
               {{ story.language.name }}
             </v-chip>
-            <v-chip class="ma-2" color="blue" label>
+            <v-chip class="mx-2" color="blue" label>
               {{ story.country.name }}
             </v-chip>
+            <v-chip class="ma-2" color="blue" label>
+              {{ story.ageGroup.description }}
+            </v-chip>
           </v-card-title>
-          <v-spacer></v-spacer>
-          <v-icon v-if="user !== null" size="large" color="primary" icon="mdi-file-pdf-box"
-            @click.stop="StoryReports.generateStoryPdf(story)"></v-icon> <v-btn v-if="!isFavoriteStory" size="large"
-            color="grey" icon="mdi-heart" @click="addFavorite" />
-          <v-btn v-if="isFavoriteStory" size="large" color="primary" icon="mdi-heart" @click="removeFavorite" />
-        </v-card-actions>
 
+
+
+          <v-card-text class="ma-2" style="font-size:medium; font-weight: bold; color: grey; text-align: justify;">
+            {{ story.story }}
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <span class="grey--text" style="font-weight: bold; font-size:8; font-style: italic; ">
+                {{ dateFormatted(story.updatedAt) }}
+              </span>
+            </v-card-actions>
+          </v-card-text>
+        </v-container>
 
         <v-card-text>
-          {{ story.story }}
 
           <v-divider class="my-3"></v-divider>
-
           <v-card-title v-if="feedbacks.length > 0">Feedbacks</v-card-title>
           <v-list v-if="feedbacks.length > 0">
             <v-list-item class="my-3" v-for="item in feedbacks" :key="item.id">
@@ -233,18 +325,29 @@ function closeSnackBar() {
                   <v-col cols="10">
                     {{ item.message }}
                   </v-col>
-                  <v-col v-if="user.id === item.user.id" cols="2">
-                    <v-btn class="ma-2" @click="editFeedback(item)">
-                      <v-icon color="green">mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn @click="deleteFeedback(item)">
-                      <v-icon color="red">mdi-delete</v-icon>
-                    </v-btn>
+                  <v-col align="right" v-if="user.id === item.user.id" cols="2">
+                    <v-icon class="mx-4" @click="editFeedback(item)" color="grey">mdi-pencil</v-icon>
+                    <v-icon @click="deleteFeedback(item)" color="grey">mdi-delete</v-icon>
                   </v-col>
                 </v-row>
               </v-list-item-title>
-              <v-list-item-subtitle> <v-spacer></v-spacer>{{ item.user.firstName }} {{ item.user.lastName
-                }}</v-list-item-subtitle>
+              <br>
+
+              <v-list-item-subtitle>
+                <v-row align="center">
+                  <v-col cols="9">
+                    <v-chip color="black" label>
+                      <v-icon start icon="mdi-account-circle-outline"></v-icon>
+                      {{ item.user.firstName }} {{ item.user.lastName }}
+                    </v-chip>
+                  </v-col>
+                  <v-col align="right" cols="3">
+                    <span class="grey--text" style="font-weight: normal; font-size:8; font-style: italic;">
+                      {{ dateFormatted(item.updatedAt) }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </v-list-item-subtitle>
             </v-list-item>
           </v-list>
 

@@ -30,6 +30,21 @@ function handleDelete(event) {
     emit('delete-story', props.story);
 }
 
+function dateFormatted(updatedAt) {
+    const date = new Date(updatedAt);
+
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const formattedDate = date.toLocaleDateString('en-US', options);
+
+    return formattedDate;
+}
 
 function showPreview(story) {
     router.push({ name: 'preview', params: { id: story.id } });
@@ -38,7 +53,7 @@ function showPreview(story) {
 </script>
 
 <template>
-    <v-card class="rounded-lg elevation-5 mb-1" @click="showDetails = !showDetails">
+    <v-card @click="showPreview(story)" class="rounded-lg elevation-5 mb-1">
         <v-card-title class="headline">
             <v-row align="center">
                 <v-col cols="10">
@@ -60,18 +75,21 @@ function showPreview(story) {
                     <v-chip class="ma-2" color="blue" label>
                         {{ story.country.name }}
                     </v-chip>
-
-                </v-col>
-                <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-delete" @click="handleDelete"></v-icon>
-                </v-col>
-                <v-col class="d-flex justify-end">
-                    <v-icon v-if="isAdmin" size="small" icon="mdi-pencil" @click="handleEditClick"></v-icon>
+                    <v-chip class="ma-2" color="blue" label>
+                        {{ story.ageGroup.description }}
+                    </v-chip>
                 </v-col>
             </v-row>
         </v-card-title>
-        <v-card-text @click="showPreview(story)" class="body-1">
+        <v-card-text class="body-1" style="font-weight: bold; color: grey; text-align: justify;">
             {{ story.story }}
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <span class="grey--text" style="font-weight: bold; font-size:8; font-style: italic;">
+                    {{ dateFormatted(story.updatedAt) }}
+                </span>
+            </v-card-actions>
         </v-card-text>
     </v-card>
 </template>
