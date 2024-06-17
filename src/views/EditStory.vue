@@ -67,7 +67,7 @@ const showLoader = ref(false);
 async function sendMesage() {
 
     showLoader.value = true;
-    console.log(chat.value);
+
     chat.value.storyId = selectedStory.value.id;
     let message = chat.value.message;
 

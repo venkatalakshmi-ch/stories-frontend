@@ -134,13 +134,10 @@ function filterStories() {
         story.ageGroup.id === selectedAgeGroupFilterId.value)
     );
   });
-
-  console.log(filterdStories.value);
 }
 
 
 async function onGenreFilterChange() {
-  console.log(selectedGenreFilterId.value);
   filterStories();
 }
 
@@ -348,7 +345,7 @@ function closeSnackBar() {
             </v-col>
 
             <v-col cols="12" md="3">
-              <v-select v-model="story.ageGroupId" :items="ageGroups" item-title="name" item-value="id" label="Age Group"
+              <v-select v-model="story.ageGroupId" :items="ageGroups" item-title="description" item-value="id" label="Age Group"
                 required></v-select>
             </v-col>
           </v-row>
